@@ -2,3 +2,5 @@ library:
         opencv-python
         pygame
         mediapipe
+hardware:
+        webcam

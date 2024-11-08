@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="BALLER TILTLE.png" alt="Logo" width="120" />
+  <img src="title.png" alt="Logo" width="120" />
   <h1>Handal</h1>
   <p>an interactive game for upper limbs exercises utilizing hand tracking.</p>
 

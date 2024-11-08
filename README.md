@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="app-icon.png" alt="NeoHtop Logo" width="120" />
+  <img src="BALLER TILTLE.png" alt="Logo" width="120" />
   <h1>Handal</h1>
   <p>an interactive game for upper limbs exercises utilizing hand tracking.</p>
 
@@ -7,7 +7,7 @@
 </div>
 
 <div align="center">
-  <img src="https://github.com/Abdenasser/neohtop/blob/main/screenshot.png?raw=true" alt="NeoHtop Screenshot" width="800" />
+  <img src="pic.png" alt="Screenshot" width="800" />
 </div>
 
 

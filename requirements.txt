@@ -1,6 +1,3 @@
-library:
-        opencv-python
-        pygame
-        mediapipe
-hardware:
-        webcam
+opencv-python
+pygame
+mediapipe

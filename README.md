@@ -28,19 +28,14 @@
 
 ### Prerequisites
 
-- Node.js (v16 or later)
-- Rust (latest stable)
-- Xcode Command Line Tools (for macOS)
+- opencv-python
+- pygame
+- mediapipe
 
 ### Setup
 
 ```bash
-# Install dependencies
-npm install
-
-# Run in development mode
-npm run tauri dev
-
-# Build for production
-npm run tauri build
+# Install requirements 
+pip install -r requirements.txt
 ```
+and run the code

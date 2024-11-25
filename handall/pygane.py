@@ -1,4 +1,3 @@
-from typing import Any
 import pygame
 import math
 from sys import exit 
@@ -6,8 +5,6 @@ from random import randint, choice
 import cv2
 import mediapipe as mp
 import pygame.gfxdraw
-mp_drawing = mp.solutions.drawing_utils
-mp_drawing_styles = mp.solutions.drawing_styles
 mp_pose = mp.solutions.pose
 
 class hand(pygame.sprite.Sprite):

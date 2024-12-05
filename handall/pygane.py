@@ -11,49 +11,56 @@ class hand(pygame.sprite.Sprite):
     def __init__(self,layer):
         super().__init__()
         self.layer = layer                  #assign hitbox type
+        self.side = True
         self.color = 'white'                #default color
-        self.bluecir = [30,255]             #shield loss visual effect stat
-        self.greencir = [120,0]             #health gain visual effect stat       
-        self.redcir = [30,255]              #health loss visual effect stat
+        self.bluecir = [30,255]             #shield loss visual effect 
+        self.greencir = [120,0]             #health gain visual effect        
+        self.redcir = [30,255]              #health loss visual effect 
 
-        self.temp_health = 2                # save the previuos instance of char stat for comparison
+        self.temp_health = 2                # save the previuos instance of balls stats for comparison
         self.temp_shield = shield
         
-        if layer == 1: hitbox = 15          # the ball have 3 square hibox for "faking" a circle hitbox
+        if layer == 1: hitbox = 15          # the ball have 3 square hibox for a circle hitbox
         if layer == 2: hitbox = 40
         if layer == 3: hitbox = 55
         self.rect = pygame.Rect(0,0,hitbox,math.sqrt(ballrad*ballrad-hitbox*hitbox/4.0)*2)
 
     def position(self):
-        self.rect.center = right_wrist_coords   #assign position of hand to character (would get overide later)
-    
-    def sfx(self):
-        global health, shield           #up to date health and shield stat duh
-        if self.layer == 1:             #only need to do it once
-            if shield == 150: self.bluecir = [30,255]                           #reset the effect when shield is full
-            if shield >= 0.3: shield -= 0.3                                     #reduce the shield overtime at rate 0.3/frame
-            if self.temp_shield - shield > 0.58: shield += 0.3                  #for when there are 2 hand on screen
-            if shield < 0.3:                             #execute the effect when shield loss
-                if self.bluecir[1] >= 15:      #expand a blue circle while it color fade away
-                    self.bluecir[0] += 5
-                    self.bluecir[1] -= 15
-                    draw_cir_alpha(screen,self.rect.centerx,self.rect.centery,self.bluecir[0],(52, 235, 219,self.bluecir[1]))
-                shield = 0
-            if health == 1 and self.redcir[1] >= 15:        #execute the effect when health reduce by 1 
-                self.redcir[0] += 5             #expand a red circle while it color fade away
-                self.redcir[1] -= 15
-                draw_cir_alpha(screen,self.rect.centerx,self.rect.centery,self.redcir[0],(255, 0, 0,self.redcir[1]))
-            if health == 2 and self.greencir[1] <= 255-20:      #execute the effect when health +1 
-                self.greencir[0] -= 5           #implode a green circle while the color deepen
-                self.greencir[1] += 15
-                draw_cir_alpha(screen,self.rect.centerx,self.rect.centery,self.greencir[0],(0, 255, 0,self.greencir[1]))
+        if self.side: self.rect.center = right_wrist_coords   #assign position of hand to character (would get overide later)
+        else: self.rect.center = left_wrist_coords
+        if game_state>0:
+            if self.rect.bottom >= rect_state.bottom: self.rect.bottom = rect_state.bottom
+            if self.rect.top <= rect_state.top: self.rect.top = rect_state.top
+            if self.rect.right >= rect_state.right: self.rect.right = rect_state.right
+            if self.rect.left <= rect_state.left: self.rect.left = rect_state.left
 
-            if self.temp_health < health: self.greencir = [120,0]   #reset the health gain effect
-            if self.temp_health > health: self.redcir = [30,255]    #reset the health loss effect
-            self.temp_health = health       #update the temp stat for comparison
-            self.temp_shield = shield
+    def sfx(self): #vfx
+        global health, shield           #up to date health and shield stat
+         
+        if shield == 150: self.bluecir = [30,255]                           #reset the effect when shield is full
+        if shield >= 0.3: shield -= 0.3                                     #reduce the shield overtime at rate 0.3/frame
+        if self.temp_shield - shield > 0.58: shield += 0.3                  #for when there are 2 hand on screen
+        if shield < 0.3:                             #execute the effect when shield loss
+            if self.bluecir[1] >= 15:      #expand a blue circle while it color fade away
+                self.bluecir[0] += 5
+                self.bluecir[1] -= 15
+                draw_cir_alpha(screen,self.rect.centerx,self.rect.centery,self.bluecir[0],(52, 235, 219,self.bluecir[1]))
+            shield = 0
+        if health == 1 and self.redcir[1] >= 15:        #execute the effect when health reduce by 1 
+            self.redcir[0] += 5             #expand a red circle while it color fade away
+            self.redcir[1] -= 15
+            draw_cir_alpha(screen,self.rect.centerx,self.rect.centery,self.redcir[0],(255, 0, 0,self.redcir[1]))
+        if health == 2 and self.greencir[1] <= 255-20:      #execute the effect when health +1 
+            self.greencir[0] -= 5           #implode a green circle while the color deepen
+            self.greencir[1] += 15
+            draw_cir_alpha(screen,self.rect.centerx,self.rect.centery,self.greencir[0],(0, 255, 0,self.greencir[1]))
+
+        if self.temp_health < health: self.greencir = [120,0]   #reset the health gain effect
+        if self.temp_health > health: self.redcir = [30,255]    #reset the health loss effect
+        self.temp_health = health       #update the temp stat for comparison
+        self.temp_shield = shield
             
-    def display(self):          #display the ball (and it stat ring only while gameplay)
+    def display(self):          #display the ball graphic (and it stat ring only while gameplay)
         global health, shield
         pygame.draw.circle(screen,'orange',self.rect.center,ballrad-5)      #background of shield ring
         pygame.draw.arc(screen,'#34ebdb',(self.rect.centerx-25,self.rect.centery-25,50,50),0,(shield/150)*2*math.pi,10) #shield ring
@@ -64,22 +71,21 @@ class hand(pygame.sprite.Sprite):
 
     def update(self):
         self.position()
-        self.sfx()
-        self.display()
+        if self.layer == 1:
+            self.sfx()
+            self.display()
 
 class righthand(hand):    # position and color of right hand
     def __init__(self,layer):
         super().__init__(layer)
         self.color = 'blue'
-    def position(self):
-        self.rect.center = right_wrist_coords
-        
+        self.side = True
+       
 class leftthand(hand):    #position and color of left hand
     def __init__(self,layer):
         super().__init__(layer)
         self.color = 'red'
-    def position(self):
-        self.rect.center = left_wrist_coords
+        self.side = False
 
 class obstacle2(pygame.sprite.Sprite):     #behaviour of sliding block
     def __init__(self,spawn_rect):
@@ -168,7 +174,7 @@ class obstacle1(pygame.sprite.Sprite):      #behaviout of poping block
         self.sprect = pygame.Rect(spawn_rect)   #get the playing field for accurate spawning
         self.engage = 0                         #counter for turning visible
         self.engage2 = 100                      #counter for flashing red
-        self.color = pygame.Color(0,255,0,0)    #color red in hex form lol
+        self.color = pygame.Color(0,255,0,0)    #color in hex form lol
         self.kill_time = 5                      #countdown till self destruct
 
         posx = randint(self.sprect.left, self.sprect.width - 50)    #randomly choose spawn location within play area
@@ -184,8 +190,7 @@ class obstacle1(pygame.sprite.Sprite):      #behaviout of poping block
         for event in event_list:
             if event.type == obstacle_timer:                       #counting down
                 self.kill_time -= 1
-            if self.kill_time == 5: self.color = pygame.Color('orange')     #start color
-            # if self.kill_time == 4: self.color = pygame.Color('orange')
+            if self.kill_time == 4: self.color = pygame.Color('orange')     #start color
             if self.kill_time == 2: self.color = pygame.Color('red')        #final color (when hitbox is on)
         
         if self.engage <1500: #slowly make color visible
@@ -571,7 +576,7 @@ start_time = 0
 test_font = pygame.font.Font('font/Pixeltype.ttf', 50)          #different font sizes
 test_font2 = pygame.font.Font('font/Pixeltype.ttf', 150)
 test_font3 = pygame.font.Font('font/Pixeltype.ttf', 800)
-instruction = 'Instruction: /n /n 1.move your hand to control the ball /n 1.avoid the quare'    #open screen intruction
+instruction = 'Instruction: /n /n 1. Move your hand to control the ball /n 2. Avoid the solid fill quare'    #open screen intruction
 
 caution = pygame.image.load('graphics/caution block.png').convert_alpha()
 game_icon = pygame.image.load('graphics/title.png').convert_alpha()             #the game logo
@@ -592,7 +597,7 @@ obstacle_group = pygame.sprite.LayeredUpdates()
 rect_state1 = pygame.Rect(0,0,screen_width,screen_height)                   #different playing field
 rect_state2 = pygame.Rect(0,0,screen_width*(2/3),screen_height)
 rect_state3 = pygame.Rect(screen_width/3,0,screen_width*(2/3),screen_height)
-rect_state = rect_state3
+rect_state = rect_state1
 switch = True
 
 #initiate group for object(a pygame feature, help with reducing the pain)
@@ -636,7 +641,7 @@ while True:
             if event.key == pygame.K_m:
                 pass
         if event.type == obstacle_timer and game_state >= 0:
-            if randint(0,5) == 0 and not shield_tile: shield_tile.add(shield_drop())    #shield spawn only when shield = 0
+            if randint(0,6) == 0 and shield == 0: shield_tile.add(shield_drop())    #shield spawn only when shield = 0
             if game_state == 3: rect_state = rect_state3                                #change the playing field
             if game_state == 2: rect_state = rect_state2
             if game_state == 1: rect_state = rect_state1
